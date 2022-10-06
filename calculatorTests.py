@@ -29,13 +29,29 @@ def testCalculate():
     assert calculate("1x2")=="x is not a valid operator"
     assert calculate("1=2")=="= is not a valid operator"
 
-    # Tests for strings ending in an operation
+    # Tests for strings beginning and ending with an operation
     assert calculate("1+2+3+")=="Expression cannot end with an operation"
     assert calculate("1+2+3*")=="Expression cannot end with an operation"
     assert calculate("1+2+3-")=="Expression cannot end with an operation"
+    assert calculate("+1+2+3")=="Expression cannot begin with an operation"
+    assert calculate("*1+2+3")=="Expression cannot begin with an operation"
+    assert calculate("--1+2+3")=="Expression cannot begin with an operation"
+    assert calculate("+-1+2+3")=="Expression cannot begin with an operation"
+    assert calculate("*-1+2+3")=="Expression cannot begin with an operation"
     
     # Tests for negative numbers
     assert calculate("-2+1")=="-1"
     assert calculate("-2-1")=="-3"
     assert calculate("-2+-1")=="-3"
     assert calculate("-2*-2")=="4"
+    assert calculate("2*-2")=="-4"
+    assert calculate("-2*3")=="-6"
+
+    # Tests for consecutive operators
+    assert calculate("2+++2")=="Invalid string, contains consecutive operators"
+    assert calculate("2---2")=="Invalid string, contains consecutive operators"
+    assert calculate("2**2")=="Invalid string, contains consecutive operators"
+    assert calculate("2-*2")=="Invalid string, contains consecutive operators"
+    assert calculate("2+*2")=="Invalid string, contains consecutive operators"
+    assert calculate("2-+2")=="Invalid string, contains consecutive operators"
+    assert calculate("2*+2")=="Invalid string, contains consecutive operators"
