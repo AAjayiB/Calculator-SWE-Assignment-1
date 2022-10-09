@@ -1,6 +1,6 @@
 import sys
 
-from .parser.parser import Parser
+from parser.parser import Parser
 
 
 def handle_args(args):
