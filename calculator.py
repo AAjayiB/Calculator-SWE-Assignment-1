@@ -1,53 +1,75 @@
-import sys
+import re
 
-from .parser.parser import Parser
+CONSECUTIVE_OPERATORS ="Invalid string, contains consecutive operators"
 
+# print("Enter an expression")
 
-def handle_args(args):
-    if len(args) > 1:
-        if args[1] == '-c':
-            if len(args) > 2:
-                p = Parser(args[2])
-                print(p.parse().value)
-                return
-        elif args[1] == '-h' or args[1] == '--help':
-            print("-c <expression> Calculate the specified expression and output the result to the standard output stream!!!")
-            print("-h, --help  Show help message.")
-            print()
-            # print copyright
-            print("no-division-calculator Copyright (C) 2022 May the force be with you!")
-            return
-    interactive()
+# answer = calculate(input())
 
+# print(answer)
 
-def interactive():
-    print("Welcome to the calculator!")
-    print("calculator Copyright (C) 2022 May the force be with you!")
-    while True:
-        try:
-            expression = input(">")
-            if not expression.strip():
-                continue  
-            p = Parser(expression)
-            print(p.parse().value)
-        except KeyboardInterrupt as ex:
-            exit(0)
-        except Exception as ex:
-            print(ex)
+def calculate(exp):
+    answer=""
+    if exp:
+        # checks for any non operators or digits
+        if not re.search(r"[^\d\+\-\*]",exp):
+            # checks for expressions beginning only with a single minus or not
+            if re.search(r"^\-?\d",exp):
+                # checks for expressions ending with only digits 
+                if re.search(r"\d$", exp):
+                    ############# ACTUAL OPERATIONS #############
+                    validExpression = re.findall(r"\d+|[\+\-\*]", exp)
+                    ############# Here at the moment
+                    if validExpression[0] =="-":
+                        validExpression[0:2]=["".join(validExpression[0:2])]
 
-def calculate():
-    print("Welcome to the calculator!")
-    print("calculator Copyright (C) 2022 May the force be with you!")
-    while True:
-        try:
-            expression = input("")
-            if expression.len() == 0:
-                 print("No input was entered.")
-            if not expression.strip():
-                continue  
-            p = Parser(expression)
-            print(p.parse().value)
-        except KeyboardInterrupt as ex:
-            exit(0)
-        except Exception as ex:
-            print(ex)
+                    while (validExpression.count("*") > 0):
+                        opIndex = validExpression.index("*")
+                        if validExpression[opIndex-1]=="+" or validExpression[opIndex-1]=="-": 
+	                        return CONSECUTIVE_OPERATORS
+                        if (validExpression[opIndex+1]=="+" or validExpression[opIndex+1]=="*"):
+                            return CONSECUTIVE_OPERATORS
+                        if (validExpression[opIndex+1]=="+" or validExpression[opIndex+1]=="*") and (validExpression[opIndex+2]=="+" or validExpression[opIndex+2]=="-" or validExpression[opIndex+2]=="*"): 
+	                        return CONSECUTIVE_OPERATORS
+                        if validExpression[opIndex+1] =="-" and (validExpression[opIndex+2]=="+" or validExpression[opIndex+2]=="-" or validExpression[opIndex+2]=="*"): 
+	                        return CONSECUTIVE_OPERATORS
+                        if validExpression[opIndex+1] =="-":
+                            validExpression[opIndex+1:opIndex+3] = ["".join(validExpression[opIndex+1:opIndex+3])]
+                        computedValue = int(validExpression[opIndex-1])*int(validExpression[opIndex+1])
+                        validExpression[opIndex-1] = computedValue
+                        validExpression.pop(opIndex+1)
+                        validExpression.pop(opIndex)
+
+                    while (validExpression.count("-") > 0):
+                        opIndex = validExpression.index("-")
+                        if validExpression[opIndex+1]=="-" or validExpression[opIndex+1]=="+":
+                            return CONSECUTIVE_OPERATORS
+                        if validExpression[opIndex-1]=="+":
+                            validExpression.pop(opIndex-1)
+                        else:
+                            computedValue = int(validExpression[opIndex-1])-int(validExpression[opIndex+1])
+                            validExpression[opIndex-1] = computedValue
+                            validExpression.pop(opIndex+1)
+                            validExpression.pop(opIndex)
+                    
+                    while (validExpression.count("+") > 0):
+                        opIndex = validExpression.index("+")
+                        if validExpression[opIndex+1]=="+":
+                            return CONSECUTIVE_OPERATORS
+                        computedValue = int(validExpression[opIndex-1])+int(validExpression[opIndex+1])
+                        validExpression[opIndex-1] = computedValue
+                        validExpression.pop(opIndex+1)
+                        validExpression.pop(opIndex)
+
+                    answer=str(validExpression[0])
+
+                else:
+                    answer="Expression cannot end with an operation"
+            else:
+                answer="Expression cannot begin with an operation"
+        else:
+            answer="Not a valid input"
+    else:
+        answer="No input was entered."
+    return answer
+
