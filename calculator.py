@@ -2,12 +2,6 @@ import re
 
 CONSECUTIVE_OPERATORS ="Invalid string, contains consecutive operators"
 
-# print("Enter an expression")
-
-# answer = calculate(input())
-
-# print(answer)
-
 def calculate(exp):
     answer=""
     if exp:
@@ -73,3 +67,9 @@ def calculate(exp):
         answer="No input was entered."
     return answer
 
+def Main():
+    print("Enter an expression")
+    print(calculate(input()))
+
+if __name__=="__main__":
+    Main()
